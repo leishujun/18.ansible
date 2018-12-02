@@ -1,0 +1,108 @@
+                                   服务第七天
+                                       ansible     
+
+修改配置文件/etc/ansible/ansible.cfg
+367 host_key_auto_add = false            取消检查密码
+111 log_path = /var/log/ansible.log    启用日志
+114  module_name = shell                    默认是command模块，启用shell模块
+
+在/etc/ansible/hosts里面写分组
+
+在最后面添加上你要操作的IP地址
+
+例如：
+
+[web]
+192.168.34.6
+192.168.34.9
+
+[app]
+192.168.34.6
+192.168.34.11
+
+ansible-doc ping   详细说明
+ansible-doc -s ping  简要说明
+
+通配符
+all            所有
+“*”         所有
+“a:b”     在a或者b中
+“a:&b” 在a中并且在b中
+'a:!b'      是a不是b，注意：要用单引号
+
+正则表达式
+“~(a|b)”在a组或b组中
+
+
+ansible "*.6" -m ping   支持通配符
+ansible all --list-host
+
+
+ansible all -m shell -a "sed -i 's/^SELINUX=.*/SELINUX=disabled/' /etc/selinux/config"
+
+ansible all -m script -a "/data/se.sh"
+
+
+     creates: 文件存在不执行
+ansible all -a "creates=/etc/fstab rm -rf /data/f1"
+    removes：文件存在执行
+ansible all -a "removes=/etc/fstab rm -rf /data/f1"
+
+
+把文件拷贝到相应的目录下并改变文件的属性，若是有相同的文件则备份
+ansible all -m copy -a "src=/data/ansible_20181121.tar dest=/data/  owner=/root/ mode=600  backup=yes"
+
+往文件中写入内容
+ansible all -m copy -a 'content="[base]\nbaseurl=file:///mnt\ngpgcheck=0"  dest=/etc/yum.repo.d/base.repo'
+
+只能抓取文件，不能抓取目录,抓取远程主机上的文件到这个目录下
+ansible all -m fetch -a 'src=/etc/hosts dest=/data/'
+
+创建删除文件
+ansible all -m file -a 'path=/data/file.txt state=touch'
+ansible all -m file -a 'path=/data/file.txt state=absent'
+
+
+创建软链接文件
+ansible all -m file -a 'src=/data/f1 path=/data/f1.link state=link'
+创建硬链接文件
+ansible all -m file -a 'src=/data/f1 path=/data/f1.link state=hard'
+
+
+ansible-console：控制台
+root@all (3)[f:5]$
+root：执行人
+all：对所有人执行，cd web  针对web成员执行任务
+3：被执行个数
+f：5:最大并发数，forks 10  修改最大并发数
+                                       yml语言  
+注意对齐：
+
+---
+  - hosts: all
+    remote_user: root
+
+    tasks:
+        - name: hello world
+          command: /usr/bin/wall hello world
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
